@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('layout/header'); -%>
+
+    <body>
+        <%- include('layout/navigation'); -%>
+            <section class="container-fluid row mt-4">
+                <div class="col-md-2 col-lg-3 hidden-sm"></div>
+                <div class="col-md-8 col-lg-6 col-sm-12">
+                    <% if ( typeof success !=='undefined' && success ) { %>
+                        <div id="success-div" class="alert alert-success" role="alert">
+                            Purchase created successfully.
+                        </div>
+                        <% } else if ( typeof success !=='undefined' && !success ) { %>
+                            <div id="failure-div" class="alert alert-danger" role="alert">
+                                Unable to make purchase! Try again later.
+                            </div>
+                            <% } %>
+                                <h1 class="mt-5 mb-5 text-center">List of Book</h1>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Select</th>
+                                            <th>Isbn</th>
+                                            <th>Title</th>
+                                            <th>Author</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for (const book of data) { %>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="book-checkbox"
+                                                        data-isbn="<%= book.Isbn %>"
+                                                        data-quantity="<%= book.BookInfo.Quantity %>"
+                                                        data-price="<%= book.BookInfo.Price %>"
+                                                        data-id="<%= book._id %>"
+                                                        data-desc="<%= book.BookInfo.Description %>"
+                                                        data-iid="<%= book.BookInfo._id %>"
+                                                        data-title="<%= book.Title %>" data-author="<%= book.Author %>">
+                                                </td>
+                                                <td>
+                                                    <%= book.Isbn %>
+                                                </td>
+                                                <td>
+                                                    <%= book.Title %>
+                                                </td>
+                                                <td>
+                                                    <%= book.Author %>
+                                                </td>
+                                                <td>
+                                                    <%= book.BookInfo.Price %>
+                                                </td>
+                                                <td><input id="<%= book._id %>" value="1" class="form-control"
+                                                        type="number" min="1" max="<%= book.BookInfo.Quantity %>"></td>
+                                            </tr>
+                                            <% } %>
+                                    </tbody>
+                                </table>
+                                <div class="mb-3 mt-5 text-center">
+                                    <button class="btn btn-primary" id="submit-button">Checkout</button>
+                                </div>
+                </div>
+                <div class="col-md-2 col-lg-3 hidden-sm"></div>
+            </section>
+
+            <script>
+                const selectedBooks = [];
+
+                const successDiv = document.getElementById('success-div');
+                const failureDiv = document.getElementById('failure-div');
+
+                function hideDiv(divElement) {
+                    divElement.style.display = 'none';
+                }
+
+                if (successDiv) {
+                    setTimeout(() => hideDiv(successDiv), 3000);
+                }
+
+                if (failureDiv) {
+                    setTimeout(() => hideDiv(failureDiv), 3000);
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const checkboxes = document.querySelectorAll('.book-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', () => {
+                            if (checkbox.checked) {
+                                selectedBooks.push({
+                                    book_id: checkbox.getAttribute('data-id'),
+                                    isbn: checkbox.getAttribute('data-isbn'),
+                                    title: checkbox.getAttribute('data-title'),
+                                    author: checkbox.getAttribute('data-author'),
+                                    price: checkbox.getAttribute('data-price'),
+                                    desc: checkbox.getAttribute('data-desc'),
+                                    quantity: checkbox.getAttribute('data-quantity'),
+                                    bookInfo_id: checkbox.getAttribute('data-iid'),
+                                    selectedQuantity: 1
+                                });
+                            } else {
+                                const index = selectedBooks.findIndex(book => book.book_id === checkbox.getAttribute('data-id'));
+                                if (index !== -1) {
+                                    selectedBooks.splice(index, 1);
+                                }
+                            }
+                        });
+                    });
+
+                    const submitButton = document.getElementById('submit-button');
+                    submitButton.addEventListener('click', () => {
+                        selectedBooks.forEach(book => book.selectedQuantity = document.getElementById(book.book_id).value);
+                        if (selectedBooks.length > 0) {
+                            localStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+                            location.replace('checkout');
+                        } else {
+                            alert('No books selected');
+                        }
+                    });
+                });
+            </script>
+
+            <%- include('layout/footer'); -%>
+
+    </body>
+
+</html>

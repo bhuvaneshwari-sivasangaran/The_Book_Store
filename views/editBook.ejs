@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('layout/header'); -%>
+
+  <body>
+    <%- include('layout/navigation'); -%>
+      <section class="container-fluid row mt-4">
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <div class="col-md-8 col-lg-6 col-sm-12">
+          <h1 class="mt-5 mb-5 text-center">Edit Book</h1>
+          <% if ( typeof success !=='undefined' && success ) { %>
+            <div id="success-div" class="alert alert-success" role="alert">
+              Book edited successfully.
+            </div>
+            <% } else if ( typeof success !=='undefined' && !success ) { %>
+              <div id="failure-div" class="alert alert-danger" role="alert">
+                Unable to edit book! Try again later.
+              </div>
+              <% } %>
+                <form method="post" action="/editBook">
+                  <div class="mb-3">
+                    <label for="isbnList" class="form-label">ISBN</label>
+                    <select class="form-select" name="isbn" id="isbnList" aria-label="Default select example">
+                      <option selected>Open this select menu</option>
+                      <% Isbn.forEach(item=> { %>
+                        <option value="<%= item %>">
+                          <%= item %>
+                        </option>
+                        <% }); %>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" disabled>
+                    <input type="text" name="_id" id="_id" hidden>
+                  </div>
+                  <div class="mb-3">
+                    <label for="author" class="form-label">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" disabled>
+                  </div>
+                  <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity</label>
+                    <input type="number" min="1" class="form-control" id="quantity" name="quantity">
+                    <input type="text" name="i_id" id="i_id" hidden>
+                  </div>
+                  <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <input min="1" type="number" class="form-control" id="price" name="price">
+                  </div>
+                  <div class="mb-5">
+                    <label for="desc" class="form-label">Description</label>
+                    <textarea id="desc" name="desc" class="form-control"></textarea>
+                  </div>
+                  <div class="mb-3 text-center">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                  </div>
+                </form>
+        </div>
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <script>
+          const dataSelect = document.getElementById('isbnList');
+
+          dataSelect.addEventListener('change', async (event) => {
+            const selectedValue = event.target.value;
+            const response = await fetch(`/getSpecificData?isbn=${selectedValue}`);
+            const data = await response.json();
+            document.getElementById('title').value = data[0].Title;
+            document.getElementById('author').value = data[0].Author;
+            document.getElementById('quantity').value = data[0].BookInfo.Quantity;
+            document.getElementById('price').value = data[0].BookInfo.Price;
+            document.getElementById('desc').value = data[0].BookInfo.Description;
+            document.getElementById('_id').value = data[0]._id;
+            document.getElementById('i_id').value = data[0].BookInfo._id;
+
+          });
+
+          const successDiv = document.getElementById('success-div');
+          const failureDiv = document.getElementById('failure-div');
+
+          function hideDiv(divElement) {
+            divElement.style.display = 'none';
+          }
+
+          if (successDiv) {
+            setTimeout(() => hideDiv(successDiv), 3000);
+          }
+
+          if (failureDiv) {
+            setTimeout(() => hideDiv(failureDiv), 3000);
+          }
+        </script>
+      </section>
+
+      <%- include('layout/footer'); -%>
+  </body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('layout/header'); -%>
+
+  <body>
+    <%- include('layout/navigation'); -%>
+      <section class="container-fluid row mt-4">
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <div class="col-md-8 col-lg-6 col-sm-12">
+          <h1 class="mt-5 mb-5 text-center">Download Invoice</h1>
+          <form>
+            <div class="mb-3">
+              <label for="date" class="form-label">Date</label>
+              <input type="date" class="form-control" id="date" name="date">
+            </div>
+            <div class="mb-3 text-center">
+              <button id="load" type="button" class="btn btn-primary">Load Invoice</button>
+            </div>
+          </form>
+          <h3 id="invoice-header"></h3>
+          <table>
+            <thead id="thead">
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('invoice-header').style.display = 'none';
+            document.getElementById("load").addEventListener("click", () => {
+              const date = document.getElementById('date').value;
+              fetch(`/getInvoice?date=${date}`)
+                .then(response => response.json())
+                .then(purchaseData => {
+                  console.log(purchaseData);
+                  let thead = document.getElementById('thead');
+                  let tbody = document.getElementById('tbody');
+                  thead.innerHTML = '';
+                  tbody.innerHTML = '';
+                  if (purchaseData.length > 0) {
+                    document.getElementById('invoice-header').style.display = 'block';
+                    document.getElementById('invoice-header').innerHTML = 'List of Invoices:'
+                    let tr = document.createElement('tr');
+                    let invoiceNumberTh = document.createElement('th');
+                    invoiceNumberTh.textContent = 'Invoice Number';
+                    let customerNameTh = document.createElement('th');
+                    customerNameTh.textContent = 'Customer Name';
+                    let customerPhoneTh = document.createElement('th');
+                    customerPhoneTh.textContent = 'Customer Phone';
+                    let downloadTh = document.createElement('th');
+                    downloadTh.textContent = 'Download';
+                    tr.appendChild(invoiceNumberTh);
+                    tr.appendChild(customerNameTh);
+                    tr.appendChild(customerPhoneTh);
+                    tr.appendChild(downloadTh);
+                    thead.appendChild(tr);
+
+                    for (const purchase of purchaseData) {
+                      let tr = document.createElement('tr');
+                      let invoiceNumberTd = document.createElement('td');
+                      invoiceNumberTd.textContent = purchase._id;
+                      let customerNameTd = document.createElement('td');
+                      customerNameTd.textContent = purchase.Customer.Name;
+                      let customerPhoneTd = document.createElement('td');
+                      customerPhoneTd.textContent = purchase.Customer.Phone;
+                      let downloadTd = document.createElement('td');
+                      let btn = document.createElement('button');
+                      btn.textContent = 'Download';
+                      btn.classList.add('btn', 'btn-primary', 'm-2');
+                      btn.addEventListener('click', () => {
+                        fetch(`/downloadInvoice?invoiceNumber=${purchase._id}`)
+                      })
+                      downloadTd.appendChild(btn);
+                      tr.appendChild(invoiceNumberTd);
+                      tr.appendChild(customerNameTd);
+                      tr.appendChild(customerPhoneTd);
+                      tr.appendChild(downloadTd);
+                      tbody.appendChild(tr);
+                    }
+                    
+                  } else if (purchaseData.length == 0) {
+                    thead.innerHTML = '';
+                    tbody.innerHTML = '';
+                    document.getElementById('invoice-header').style.display = 'block';
+                    document.getElementById('invoice-header').innerHTML = 'No data to display!'
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+            });
+          });
+        </script>
+      </section>
+
+      <%- include('layout/footer'); -%>
+  </body>
+
+</html>

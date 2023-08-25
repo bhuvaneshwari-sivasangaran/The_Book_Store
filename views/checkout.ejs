@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('layout/header'); -%>
+<body>
+    <%- include('layout/navigation'); -%>
+    <section class="container-fluid row mt-4">
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <div class="col-md-8 col-lg-6 col-sm-12">
+            <h1 class="mt-2 mb-5 text-center">Checkout</h1>
+            <h3>Selected books:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Isbn</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+            <h5 class="mt-3" id="total"></h5>
+            <h3 class="mt-3">Customer Details:</h3>
+            <form method="post" action="/addCustomer">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name">
+                    <input type="text" name="selectedBooks" id="books" hidden>
+                  </div>
+                  <div class="mb-3">
+                      <label for="phone" class="form-label">Phone</label>
+                      <input type="text" class="form-control" id="phone" name="phone">
+                    </div>
+                  <div class="mb-5">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="email" name="email">
+                  </div>
+                <div class="mb-3 text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+        </div>
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(){ 
+                let tbody = document.getElementById('tbody');
+                let selectedBooks = JSON.parse(localStorage.getItem('selectedBooks'));
+                document.getElementById('books').value = JSON.stringify(selectedBooks);
+                let total = 0;
+                for ( let val of selectedBooks ) {
+                    let tr = document.createElement('tr');
+                    let isbnTd = document.createElement('td');
+                    isbnTd.textContent = val.isbn;
+                    let titleTd = document.createElement('td');
+                    titleTd.textContent = val.title;
+                    let authorTd = document.createElement('td');
+                    authorTd.textContent = val.author;
+                    let priceTd = document.createElement('td');
+                    priceTd.textContent = val.price;
+                    let quantityTd = document.createElement('td');
+                    quantityTd.textContent = val.selectedQuantity;
+                    total += Number(val.price) * Number(val.selectedQuantity);
+                    tr.appendChild(isbnTd);
+                    tr.appendChild(titleTd);
+                    tr.appendChild(authorTd);
+                    tr.appendChild(priceTd);
+                    tr.appendChild(quantityTd);
+                    tbody.appendChild(tr);
+                }
+                document.getElementById('total').innerHTML = 'Total: $ ' + total;
+            })
+        </script>    
+    </section>
+
+    <%- include('layout/footer'); -%>
+</body>
+</html>

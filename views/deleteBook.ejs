@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('layout/header'); -%>
+
+  <body>
+    <%- include('layout/navigation'); -%>
+      <section class="container-fluid row mt-4">
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <div class="col-md-8 col-lg-6 col-sm-12">
+          <h1 class="mt-5 mb-5 text-center">Delete Book</h1>
+          <% if ( typeof success !=='undefined' && success ) { %>
+            <div id="success-div" class="alert alert-success" role="alert">
+              Book deleted successfully.
+            </div>
+            <% } else if ( typeof success !=='undefined' && !success ) { %>
+              <div id="failure-div" class="alert alert-danger" role="alert">
+                Unable to delete book! Try again later.
+              </div>
+              <% } %>
+                <form method="post" action="/deleteBook">
+                  <div class="mb-5">
+                    <label for="isbnList" class="form-label">ISBN</label>
+                    <select class="form-select" name="isbn" id="isbnList" aria-label="Default select example">
+                      <option selected>Open this select menu</option>
+                      <% Isbn.forEach(item=> { %>
+                        <option value="<%= item %>">
+                          <%= item %>
+                        </option>
+                        <% }); %>
+                    </select>
+                  </div>
+                  <div class="mb-3 text-center">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                  </div>
+                </form>
+        </div>
+        <div class="col-md-2 col-lg-3 hidden-sm"></div>
+        <script>
+          const dataSelect = document.getElementById('isbnList');
+
+          dataSelect.addEventListener('change', async (event) => {
+            const selectedValue = event.target.value;
+          });
+
+          const successDiv = document.getElementById('success-div');
+          const failureDiv = document.getElementById('failure-div');
+
+          function hideDiv(divElement) {
+            divElement.style.display = 'none';
+          }
+
+          if (successDiv) {
+            setTimeout(() => hideDiv(successDiv), 3000);
+          }
+
+          if (failureDiv) {
+            setTimeout(() => hideDiv(failureDiv), 3000);
+          }
+        </script>
+      </section>
+
+      <%- include('layout/footer'); -%>
+  </body>
+
+</html>
